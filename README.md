@@ -16,35 +16,12 @@ gem 'active_interaction-extras'
 class ApplicationInteraction < ActiveInteraction::Base
   include ActiveInteraction::Extras::All
   # same as
-  # include ActiveInteraction::Extras::ActiveJob
   # include ActiveInteraction::Extras::Halt
   # include ActiveInteraction::Extras::ModelFields
   # include ActiveInteraction::Extras::RunCallback
   # include ActiveInteraction::Extras::StrongParams
   # include ActiveInteraction::Extras::Transaction
 end
-```
-
-### ActiveJob
-
-```ruby
-class ApplicationInteraction < ActiveInteraction::Base
-  include ActiveInteraction::Extras::ActiveJob
-
-  class Job < ActiveJob::Base
-    include ActiveInteraction::Extras::ActiveJob::Perform
-  end
-end
-
-class DoubleService < ApplicationInteraction
-  integer :x
-
-  def execute
-    x + x
-  end
-end
-
-DoubleService.delay.run(x: 2) # queues to run in background
 ```
 
 ### Halt
@@ -162,6 +139,55 @@ end
 
 UpdateUserForm.run
 Comment.count # => 0
+```
+
+### ActiveJob
+
+```ruby
+class ApplicationInteraction < ActiveInteraction::Base
+  include ActiveInteraction::Extras::ActiveJob
+
+  class Job < ActiveJob::Base
+    include ActiveInteraction::Extras::ActiveJob::Perform
+  end
+end
+
+class DoubleService < ApplicationInteraction
+  integer :x
+
+  def execute
+    x + x
+  end
+end
+
+DoubleService.delay.run(x: 2) # queues to run in background
+```
+
+### Sidekiq
+
+```ruby
+class ApplicationInteraction < ActiveInteraction::Base
+  include ActiveInteraction::Extras::Sidekiq
+
+  class Job
+    include Sidekiq::Worker
+    include ActiveInteraction::Extras::Sidekiq::Perform
+  end
+end
+
+class DoubleService < ApplicationInteraction
+  job do
+    sidekiq_options retry: 1
+  end
+
+  integer :x
+
+  def execute
+    x + x
+  end
+end
+
+DoubleService.delay.run(x: 2) # queues to run in background
 ```
 
 ### Rspec

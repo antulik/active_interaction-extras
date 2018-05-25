@@ -1,7 +1,6 @@
 module ActiveInteraction::Extras::All
   extend ActiveSupport::Concern
 
-  include ActiveInteraction::Extras::ActiveJob
   include ActiveInteraction::Extras::Halt
   include ActiveInteraction::Extras::ModelFields
   include ActiveInteraction::Extras::RunCallback

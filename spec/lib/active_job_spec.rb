@@ -16,7 +16,15 @@ RSpec.describe ActiveInteraction::Extras::ActiveJob do
     end
   end
 
-  class self::DelayForm < TestableService
+  class self::WithJob < TestableService
+    include ActiveInteraction::Extras::ActiveJob
+
+    class Job < ActiveJob::Base
+      include ActiveInteraction::Extras::ActiveJob::Perform
+    end
+  end
+
+  class self::DelayForm < self::WithJob
     interface :some_object
 
     def execute
