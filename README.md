@@ -120,6 +120,14 @@ form_params = ActionController::Parameters.new(
 )
 
 Service.run(params: form_params)
+
+# OR
+form_params = ActionController::Parameters.new(
+  first_name: 'Allowed',
+  last_name: 'Not allowed',
+)
+
+Service.run(form_params: form_params)
 ```
 
 ### Transaction
