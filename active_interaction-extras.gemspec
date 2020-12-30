@@ -9,9 +9,9 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Anton Katunin"]
   spec.email         = ["antulik@gmail.com"]
 
-  spec.summary       = %q{Extension for active_interaction gem}
-  spec.description   = %q{Extension for active_interaction gem}
-  spec.homepage      = "https://github.com/antulik/xxxx"
+  spec.summary       = %q{Extensions for active_interaction gem}
+  spec.description   = %q{Extensions for active_interaction gem}
+  spec.homepage      = "https://github.com/antulik/active_interaction-extras"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
