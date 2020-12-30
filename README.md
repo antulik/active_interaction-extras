@@ -227,7 +227,7 @@ RSpec.describe SomeService do
 
     # expect_to_run / expect_not_to_run / expect_to_not_run
     # expect_to_execute
-    # expect_to_delay_run / expect_to_not_run_delayed
+    # expect_to_delay_run / expect_not_to_run_delayed / expect_to_not_run_delayed
     # expect_to_delay_execute
   end
 end

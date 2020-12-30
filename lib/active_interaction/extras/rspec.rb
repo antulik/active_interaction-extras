@@ -67,6 +67,8 @@ module ActiveInteraction::Extras::Rspec
     expect(klass).to_not receive(:delay).with(*with)
   end
 
+  alias expect_to_not_run_delayed expect_not_to_run_delayed
+
   # see expect_to_run
   #
   # additional params
