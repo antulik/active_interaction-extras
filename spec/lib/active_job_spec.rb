@@ -1,35 +1,37 @@
 require 'global_id'
 
-RSpec.describe ActiveInteraction::Extras::ActiveJob do
+RSpec.describe ActiveInteraction::Extras::Jobs::ActiveJob do
   include ActiveJob::TestHelper
 
-  class self::GlobalIdClass
-    include GlobalID::Identification
-    attr_reader :id
+  before do
+    stub_const('GlobalIdClass', Class.new do
+      include GlobalID::Identification
+      attr_reader :id
 
-    def initialize(id)
-      @id = id
-    end
+      def initialize(id)
+        @id = id
+      end
 
-    def self.find(*)
-      raise
-    end
-  end
+      def self.find(*)
+        raise
+      end
+    end)
 
-  class self::WithJob < TestableService
-    include ActiveInteraction::Extras::ActiveJob
+    stub_const('WithJob', Class.new(TestableService) do
+      include ActiveInteraction::Extras::Jobs::ActiveJob
+    end)
 
-    class Job < ActiveJob::Base
-      include ActiveInteraction::Extras::ActiveJob::Perform
-    end
-  end
+    stub_const('WithJob::Job', Class.new(ActiveJob::Base) do
+      include ActiveInteraction::Extras::Jobs::ActiveJob::Perform
+    end)
 
-  class self::DelayForm < self::WithJob
-    interface :some_object
+    stub_const('DelayForm', Class.new(WithJob) do
+      anything :some_object
 
-    def execute
-      some_object
-    end
+      def execute
+        some_object
+      end
+    end)
   end
 
   after do
@@ -39,8 +41,8 @@ RSpec.describe ActiveInteraction::Extras::ActiveJob do
 
   describe '#delay' do
     it 'serializes objects' do
-      obj = self.class::GlobalIdClass.new(2)
-      self.class::DelayForm.delay.run(some_object: obj)
+      obj = GlobalIdClass.new(2)
+      DelayForm.delay.run(some_object: obj)
 
       expect(ActiveJob::Base.queue_adapter.enqueued_jobs).to include(
         hash_including(
@@ -55,12 +57,12 @@ RSpec.describe ActiveInteraction::Extras::ActiveJob do
     end
 
     it 'deserializes objects' do
-      obj = self.class::GlobalIdClass.new(2)
-      expect(self.class::GlobalIdClass).to receive(:find).with('2').and_return(obj)
+      obj = GlobalIdClass.new(2)
+      expect(GlobalIdClass).to receive(:find).with('2').and_return(obj)
 
-      result = self.class::DelayForm::Job.execute(
+      result = DelayForm::Job.execute(
         {
-          'job_class' => self.class::DelayForm::Job.name,
+          'job_class' => DelayForm::Job.name,
           'arguments' => [{
             "some_object" => {
               "_aj_globalid" => obj.to_gid.to_s },

@@ -2,7 +2,7 @@ RSpec.describe ActiveInteraction::Extras::ModelFields do
   context 'simple form' do
     let(:test_form_class) do
       Class.new(TestableService) do
-        interface :model
+        anything :model
 
         model_fields :model, default: nil do
           date :date_field
@@ -90,8 +90,8 @@ RSpec.describe ActiveInteraction::Extras::ModelFields do
   context 'nested models' do
     let(:test_nested_form) do
       Class.new(TestableService) do
-        interface :model_a
-        interface :model_b, default: -> { model_a.b }
+        anything :model_a
+        anything :model_b, default: -> { model_a.b }
 
         model_fields :model_b, default: nil do
           date :date_field

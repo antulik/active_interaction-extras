@@ -2,7 +2,7 @@ RSpec.describe ActiveInteraction::Extras::RunCallback do
   describe 'run callbacks' do
     let(:test_class) do
       Class.new(TestableService) do
-        interface :x
+        anything :x
         boolean :with_presence, default: false
         boolean :with_execute_error, default: false
 
