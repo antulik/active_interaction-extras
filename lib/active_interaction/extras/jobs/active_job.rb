@@ -1,6 +1,6 @@
 require 'active_interaction/active_job'
 
-module ActiveInteraction::Extras::ActiveJob
+module ActiveInteraction::Extras::Jobs::ActiveJob
   extend ActiveSupport::Concern
 
   include ActiveInteraction::ActiveJob::Core

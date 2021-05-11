@@ -1,6 +1,6 @@
 require 'active_interaction/active_job'
 
-module ActiveInteraction::Extras::Sidekiq
+module ActiveInteraction::Extras::Jobs::Sidekiq
   extend ActiveSupport::Concern
 
   include ActiveInteraction::ActiveJob::Sidekiq::Core
