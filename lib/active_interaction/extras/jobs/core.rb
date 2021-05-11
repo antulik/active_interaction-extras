@@ -2,16 +2,15 @@ module ActiveInteraction::Extras::Jobs::Core
   extend ActiveSupport::Concern
 
   class_methods do
-    def define_job_class klass
+    def define_job_class(klass)
       unless const_defined?(:Job, false)
         const_set(:Job, Class.new(klass))
       end
     end
 
-    def active_job &block
+    def job(&block)
       job_class.class_exec(&block)
     end
-    alias_method :job, :active_job
 
     def job_class
       const_get(:Job, false)
@@ -23,6 +22,10 @@ module ActiveInteraction::Extras::Jobs::Core
     end
 
     def delay(options = {})
+      configured_job_class.new(job_class, options)
+    end
+
+    def configured_job_class
       raise NotImplementedError
     end
   end

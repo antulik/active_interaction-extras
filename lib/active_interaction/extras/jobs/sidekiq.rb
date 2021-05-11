@@ -6,8 +6,8 @@ module ActiveInteraction::Extras::Jobs::Sidekiq
   include ActiveInteraction::Extras::Jobs::Core
 
   class_methods do
-    def delay(options = {})
-      ConfiguredJob.new(job_class, options)
+    def configured_job_class
+      ConfiguredJob
     end
   end
 
