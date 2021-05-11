@@ -18,6 +18,10 @@ module ActiveInteraction::Extras::Jobs::Sidekiq
       def deserialize_active_job_args(serialized_job)
         ActiveJob::Arguments.deserialize(serialized_job['args']).first&.with_indifferent_access || {}
       end
+
+      def perform_later(*args)
+        ConfiguredJob.new(self).perform_later(*args)
+      end
     end
 
     def perform(*args)

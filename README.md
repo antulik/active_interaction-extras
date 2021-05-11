@@ -239,7 +239,7 @@ Comment.count # => 0
 
 ## Jobs
 
-Job extensions automatically convert interactions to background jobs. By convention each interaction will have a nested `Job` class which will be inherited from the parent interaction `Job` class (e.g. `ApplicationInteraction::Job`).
+You no longer need to create a separate Job class for the each interaction. This Job extension automatically converts interactions to background jobs. By convention each interaction will have a nested `Job` class which will be inherited from the parent interaction `Job` class (e.g. `ApplicationInteraction::Job`). 
 
 ### ActiveJob
 
@@ -261,6 +261,7 @@ class DoubleService < ApplicationInteraction
 end
 
 DoubleService.delay.run(x: 2) # queues to run in background
+DoubleService.delay(queue: 'low_priority', wait: 1.minute).run(x: 2)
 ```
 
 In ActiveJob mode `delay` method accepts anything ActiveJob `set` [method](https://edgeapi.rubyonrails.org/classes/ActiveJob/Core/ClassMethods.html#method-i-set) does. (`wait`, `wait_until`, `queue`, `priority`)
