@@ -1,32 +1,26 @@
+# Add transaction wrapper
+#   run_in_transaction!
+#   skip_run_in_transaction!
 module ActiveInteraction::Extras::Transaction
   extend ActiveSupport::Concern
 
-  def run_in_transaction!
-    result_or_errors = nil
-    ActiveRecord::Base.transaction do
-      result_or_errors = yield
-
-      # check by class because
-      # errors added by compose method are merged after execute,
-      # so we need to check return type ourselves
-      #
-      # see ActiveInteraction::Runnable#run
-      if result_or_errors.is_a?(ActiveInteraction::Errors) && result_or_errors.any?
-        raise ActiveRecord::Rollback
+  included do
+    class_attribute :run_in_transaction_options
+    set_callback :execute, :around, ->(_interaction, block) {
+      ActiveRecord::Base.transaction(run_in_transaction_options) do
+        block.call
       end
-
-      raise ActiveRecord::Rollback if errors.any?
-    end
-    result_or_errors
+    }, if: :run_in_transaction_options
   end
 
   class_methods do
-    def run_in_transaction!
-      set_callback :execute, :around, :run_in_transaction!, prepend: true
+    # https://pragtob.wordpress.com/2017/12/12/surprises-with-nested-transactions-rollbacks-and-activerecord/
+    def run_in_transaction!(requires_new: true)
+      self.run_in_transaction_options = {requires_new: requires_new}
     end
 
     def skip_run_in_transaction!
-      skip_callback :execute, :around, :run_in_transaction!
+      self.run_in_transaction_options = nil
     end
   end
 end
