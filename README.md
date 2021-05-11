@@ -1,5 +1,7 @@
 # ActiveInteraction::Extras
 
+[![Gem Version](https://badge.fury.io/rb/active_interaction-extras.svg)](https://badge.fury.io/rb/active_interaction-extras)
+
 This gem contains the collection of useful extensions to [active_interaction](https://github.com/AaronLasseigne/active_interaction) gem.
 
 - [Installation](#installation)
@@ -261,7 +263,11 @@ end
 DoubleService.delay.run(x: 2) # queues to run in background
 ```
 
+In ActiveJob mode `delay` method accepts anything ActiveJob `set` [method](https://edgeapi.rubyonrails.org/classes/ActiveJob/Core/ClassMethods.html#method-i-set) does. (`wait`, `wait_until`, `queue`, `priority`)
+
 ### Sidekiq
+
+You can use sidekiq directly if you need more control. Sidekiq integration comes with default GlobalID support.
 
 ```ruby
 class ApplicationInteraction < ActiveInteraction::Base
@@ -275,7 +281,7 @@ end
 
 class DoubleService < ApplicationInteraction
   job do
-    sidekiq_options retry: 1
+    sidekiq_options retry: 1 # configure sidekiq options
   end
 
   integer :x
@@ -286,6 +292,50 @@ class DoubleService < ApplicationInteraction
 end
 
 DoubleService.delay.run(x: 2) # queues to run in background
+DoubleService.delay(queue: 'low_priority', wait: 1.minute).run(x: 2)
+```
+
+In Sidekiq mode `delay` method accepts anything sidekiq `set` [method](https://github.com/mperham/sidekiq/wiki/Advanced-Options#workers) does (`queue`, `retry`, `backtrace`, etc). Plus two additional `wait` and `wait_until`.
+
+```ruby
+# Advance usage: retry based on given params
+class DoubleService < ApplicationInteraction
+  job do
+    sidekiq_options(retry: ->(job) {
+      params = deserialize_active_job_args(job)
+      params[:x]
+    })
+  end
+
+  integer :x
+
+  def execute
+    x + x
+  end
+end
+```
+
+```ruby
+# Advance usage: Rescue the job but not service
+class DoubleService < ApplicationInteraction
+  job do
+    def perform(*args)
+      super
+    rescue StandardError => e
+      params = deserialize_active_job_args(args)
+      params[:x]
+    end
+  end
+
+  integer :x
+
+  def execute
+    raise
+  end
+end
+
+DoubleService.run # => RuntimeError
+DoubleService.delay.perform_now(x: 2) # => returns 2
 ```
 
 ## Rspec
