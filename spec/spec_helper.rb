@@ -1,4 +1,6 @@
 require 'active_interaction/extras'
+require 'active_interaction/extras/filter_extensions'
+require 'active_job'
 
 require 'support/testable_service'
 require 'pry'

@@ -1,4 +1,4 @@
-require 'active_interaction/active_job'
+require 'active_job'
 
 module ActiveInteraction::Extras::Jobs::ActiveJob
   extend ActiveSupport::Concern

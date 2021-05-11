@@ -1,4 +1,4 @@
-require 'active_interaction/active_job'
+require 'active_job'
 
 module ActiveInteraction::Extras::Jobs::Sidekiq
   extend ActiveSupport::Concern

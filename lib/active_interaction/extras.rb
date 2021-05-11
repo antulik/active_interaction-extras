@@ -13,6 +13,7 @@ module ActiveInteraction
 
     module Jobs
       autoload(:ActiveJob, "active_interaction/extras/jobs/active_job")
+      autoload(:Core, "active_interaction/extras/jobs/core")
       autoload(:Sidekiq, "active_interaction/extras/jobs/sidekiq")
     end
 
