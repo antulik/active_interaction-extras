@@ -2,25 +2,112 @@
 
 This gem contains the collection of useful extensions to [active_interaction](https://github.com/AaronLasseigne/active_interaction) gem.
 
+- [Installation](#installation)
+- [Basic Usage](#basic-usage)
+- [Filters](#filters)
+    - [Anything](#anything)
+    - [UUID](#uuid)
+- [Filter Extensions](#filter-extensions)
+    - [Hash: auto strip](#hash-auto-strip)
+    - [Object: multiple classes](#object-multiple-classes)
+- [Extensions](#extensions)
+  - [Filter alias](#filter-alias)
+  - [Halt](#halt)
+  - [ModelFields](#modelfields)
+  - [RunCallback](#runcallback)
+  - [StrongParams](#strongparams)
+  - [Transaction](#transaction)
+- [Jobs](#jobs)
+  - [ActiveJob](#activejob)
+  - [Sidekiq](#sidekiq)
+- [RSpec](#rspec)
+
 ## Installation
 
 ```ruby
 gem 'active_interaction-extras'
 ```
 
-## Usage
-
-### All
+## Basic Usage
 
 ```ruby
+# app/services/application_interaction.rb
 class ApplicationInteraction < ActiveInteraction::Base
   include ActiveInteraction::Extras::All
-  # same as
-  # include ActiveInteraction::Extras::Halt
-  # include ActiveInteraction::Extras::ModelFields
-  # include ActiveInteraction::Extras::RunCallback
-  # include ActiveInteraction::Extras::StrongParams
-  # include ActiveInteraction::Extras::Transaction
+end
+```
+
+## Filters
+
+These new filters are added automatically when gem is loaded.
+
+### Anything
+
+Anything filter accepts as you guest it - anything.
+
+```ruby
+class Service < ActiveInteraction::Base
+  anything :model
+end
+```
+
+### UUID
+
+```ruby
+class Service < ActiveInteraction::Base
+  uuid :id
+end
+```
+
+## Filter Extensions
+
+You can load all filter extensions with:
+
+```ruby
+# config/initializers/active_interaction.rb
+require 'active_interaction/extras/filter_extensions'
+```
+
+### Hash: auto strip
+
+This small extensions allows to accept full hashes without explicit `strip` option.
+
+```ruby
+class Service < ActiveInteraction::Base
+  hash :options_a, strip: false # (Before) Accept all keys
+  
+  hash :options_b # (After) Accept all keys
+  
+  hash :options_c do # (Before and After) Accept only specified keys
+    string :name
+  end
+end
+```
+
+### Object: multiple classes
+
+This extension allows using `object` filter with multiple classes.
+
+```ruby
+class Service < ActiveInteraction::Base
+  object :user, class: [User, AdminUser]
+end
+```
+
+
+## Extensions
+
+### Filter Alias
+
+```ruby
+class Service < ActiveInteraction::Base
+  include ActiveInteraction::Extras::FilterAlias
+  
+  hash :params, as: :user_attributes
+
+  def execute
+    user_attributes == params # => true
+  end
 end
 ```
 
@@ -50,7 +137,7 @@ end
 class UserForm < ActiveInteraction::Base
   include ActiveInteraction::Extras::ModelFields
 
-  interface :user
+  anything :user
 
   model_fields(:user) do
     string :first_name
@@ -95,7 +182,6 @@ end
 ```
 
 ### StrongParams
-
 
 ```ruby
 class UpdateUserForm < ActiveInteraction::Base
@@ -149,14 +235,18 @@ UpdateUserForm.run
 Comment.count # => 0
 ```
 
+## Jobs
+
+Job extensions automatically convert interactions to background jobs. By convention each interaction will have a nested `Job` class which will be inherited from the parent interaction `Job` class (e.g. `ApplicationInteraction::Job`).
+
 ### ActiveJob
 
 ```ruby
 class ApplicationInteraction < ActiveInteraction::Base
-  include ActiveInteraction::Extras::ActiveJob
+  include ActiveInteraction::Extras::Jobs::ActiveJob
 
   class Job < ActiveJob::Base
-    include ActiveInteraction::Extras::ActiveJob::Perform
+    include ActiveInteraction::Extras::Jobs::ActiveJob::Perform
   end
 end
 
@@ -175,7 +265,7 @@ DoubleService.delay.run(x: 2) # queues to run in background
 
 ```ruby
 class ApplicationInteraction < ActiveInteraction::Base
-  include ActiveInteraction::Extras::Sidekiq
+  include ActiveInteraction::Extras::Jobs::Sidekiq
 
   class Job
     include Sidekiq::Worker
@@ -198,7 +288,7 @@ end
 DoubleService.delay.run(x: 2) # queues to run in background
 ```
 
-### Rspec
+## Rspec
 
 ```ruby
 class SomeService < ActiveInteraction::Base
