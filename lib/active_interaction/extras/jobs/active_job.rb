@@ -24,7 +24,12 @@ module ActiveInteraction::Extras::Jobs::ActiveJob
   end
 
   class ConfiguredJob < ::ActiveJob::ConfiguredJob
-    alias_method :run!, :perform_later
-    alias_method :run, :perform_later
+    def run(*args)
+      perform_later(*args)
+    end
+
+    def run!(*args)
+      perform_later(*args)
+    end
   end
 end
