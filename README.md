@@ -276,7 +276,7 @@ class ApplicationInteraction < ActiveInteraction::Base
 
   class Job
     include Sidekiq::Worker
-    include ActiveInteraction::Extras::Sidekiq::Perform
+    include ActiveInteraction::Extras::Jobs::Sidekiq::Perform
   end
 end
 
