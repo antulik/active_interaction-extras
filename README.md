@@ -245,10 +245,10 @@ You no longer need to create a separate Job class for the each interaction. This
 
 ```ruby
 class ApplicationInteraction < ActiveInteraction::Base
-  include ActiveInteraction::Extras::Jobs::ActiveJob
+  include ActiveInteraction::Extras::ActiveJob
 
   class Job < ActiveJob::Base
-    include ActiveInteraction::Extras::Jobs::ActiveJob::Perform
+    include ActiveInteraction::Extras::ActiveJob::Perform
   end
 end
 
@@ -272,11 +272,11 @@ You can use sidekiq directly if you need more control. Sidekiq integration comes
 
 ```ruby
 class ApplicationInteraction < ActiveInteraction::Base
-  include ActiveInteraction::Extras::Jobs::Sidekiq
+  include ActiveInteraction::Extras::Sidekiq
 
   class Job
     include Sidekiq::Worker
-    include ActiveInteraction::Extras::Jobs::Sidekiq::Perform
+    include ActiveInteraction::Extras::Sidekiq::Perform
   end
 end
 

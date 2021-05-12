@@ -12,9 +12,7 @@ module ActiveInteraction
     end
 
     module Jobs
-      autoload(:ActiveJob, "active_interaction/extras/jobs/active_job")
       autoload(:Core, "active_interaction/extras/jobs/core")
-      autoload(:Sidekiq, "active_interaction/extras/jobs/sidekiq")
     end
 
     autoload(:All, "active_interaction/extras/all")
@@ -25,7 +23,11 @@ module ActiveInteraction
     autoload(:RunCallback, "active_interaction/extras/run_callback")
     autoload(:StrongParams, "active_interaction/extras/strong_params")
     autoload(:Transaction, "active_interaction/extras/transaction")
+
     autoload(:Rspec, "active_interaction/extras/rspec")
+
+    autoload(:ActiveJob, "active_interaction/extras/active_job")
+    autoload(:Sidekiq, "active_interaction/extras/sidekiq")
   end
 end
 

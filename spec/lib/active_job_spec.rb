@@ -1,6 +1,6 @@
 require 'global_id'
 
-RSpec.describe ActiveInteraction::Extras::Jobs::ActiveJob do
+RSpec.describe ActiveInteraction::Extras::ActiveJob do
   include ActiveJob::TestHelper
 
   before do
@@ -18,11 +18,11 @@ RSpec.describe ActiveInteraction::Extras::Jobs::ActiveJob do
     end)
 
     stub_const('WithJob', Class.new(TestableService) do
-      include ActiveInteraction::Extras::Jobs::ActiveJob
+      include ActiveInteraction::Extras::ActiveJob
     end)
 
     stub_const('WithJob::Job', Class.new(ActiveJob::Base) do
-      include ActiveInteraction::Extras::Jobs::ActiveJob::Perform
+      include ActiveInteraction::Extras::ActiveJob::Perform
     end)
 
     stub_const('DelayForm', Class.new(WithJob) do
