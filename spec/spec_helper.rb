@@ -3,6 +3,7 @@ require 'active_interaction/extras/filter_extensions'
 require 'active_job'
 
 require 'support/testable_service'
+require 'support/testing_helpers'
 require 'pry'
 
 GlobalID.app = :foo
@@ -107,4 +108,6 @@ RSpec.configure do |config|
   # as the one that triggered the failure.
   Kernel.srand config.seed
 =end
+
+  config.include TestingHelpers
 end

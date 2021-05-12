@@ -24,6 +24,7 @@ module ActiveInteraction
     autoload(:StrongParams, "active_interaction/extras/strong_params")
     autoload(:Transaction, "active_interaction/extras/transaction")
 
+    autoload(:TimezoneSupport, "active_interaction/extras/timezone_support")
     autoload(:Rspec, "active_interaction/extras/rspec")
 
     autoload(:ActiveJob, "active_interaction/extras/active_job")
