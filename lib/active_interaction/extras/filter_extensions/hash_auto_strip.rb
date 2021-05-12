@@ -15,11 +15,11 @@
 #     string :name
 #   end
 #
-module ActiveInteraction::Extras::FilterExtensions::AutoStripHash
+module ActiveInteraction::Extras::FilterExtensions::HashAutoStrip
   def initialize(*)
     super
     options[:strip] = false if !block_given? && !options.key?(:strip)
   end
 end
 
-ActiveInteraction::HashFilter.prepend(ActiveInteraction::Extras::FilterExtensions::AutoStripHash)
+ActiveInteraction::HashFilter.prepend(ActiveInteraction::Extras::FilterExtensions::HashAutoStrip)

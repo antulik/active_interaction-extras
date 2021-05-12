@@ -3,7 +3,7 @@
 # Add support for polymorphic objects
 #   object :account, class: [Account, AnyoneAccount]
 #
-module ActiveInteraction::Extras::FilterExtensions::MultiObject
+module ActiveInteraction::Extras::FilterExtensions::ObjectClasses
   def class_list
     class_names.map do |klass_name|
       case klass_name
@@ -44,4 +44,4 @@ module ActiveInteraction::Extras::FilterExtensions::MultiObject
   end
 end
 
-ActiveInteraction::ObjectFilter.prepend(ActiveInteraction::Extras::FilterExtensions::MultiObject)
+ActiveInteraction::ObjectFilter.prepend(ActiveInteraction::Extras::FilterExtensions::ObjectClasses)

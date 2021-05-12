@@ -1,2 +1,2 @@
-require 'active_interaction/extras/filter_extensions/auto_strip_hash'
-require 'active_interaction/extras/filter_extensions/multi_object'
+require 'active_interaction/extras/filter_extensions/hash_auto_strip'
+require 'active_interaction/extras/filter_extensions/object_classes'

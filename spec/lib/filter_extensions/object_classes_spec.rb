@@ -1,4 +1,4 @@
-RSpec.describe ActiveInteraction::Extras::FilterExtensions::MultiObject do
+RSpec.describe ActiveInteraction::Extras::FilterExtensions::ObjectClasses do
   context 'with multiple classes' do
     before do
       stub_const('UserA', Class.new)
