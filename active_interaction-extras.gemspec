@@ -13,6 +13,9 @@ Gem::Specification.new do |spec|
   spec.description   = %q{Extensions for active_interaction gem}
   spec.homepage      = "https://github.com/antulik/active_interaction-extras"
   spec.license       = "MIT"
+  spec.metadata    = {
+    "changelog_uri" => "https://github.com/antulik/active_interaction-extras/blob/master/CHANGELOG.md",
+  }
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})
