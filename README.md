@@ -1,6 +1,6 @@
 # ActiveInteraction::Extras
 
-[![Gem Version](https://badge.fury.io/rb/active_interaction-extras.svg)](https://badge.fury.io/rb/active_interaction-extras)
+[![Gem Version](https://badge.fury.io/rb/active_interaction-extras.svg)](https://badge.fury.io/rb/active_interaction-extras) ![CI build](https://github.com/antulik/active_interaction-extras/actions/workflows/ci.yml/badge.svg)
 
 This gem contains the collection of useful extensions to [active_interaction](https://github.com/AaronLasseigne/active_interaction) gem.
 
