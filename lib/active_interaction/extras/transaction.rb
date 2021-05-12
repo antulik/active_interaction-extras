@@ -7,7 +7,7 @@ module ActiveInteraction::Extras::Transaction
   included do
     class_attribute :run_in_transaction_options
     set_callback :execute, :around, ->(_interaction, block) {
-      ActiveRecord::Base.transaction(run_in_transaction_options) do
+      ActiveRecord::Base.transaction(**run_in_transaction_options) do
         block.call
       end
     }, if: :run_in_transaction_options
