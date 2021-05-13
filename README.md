@@ -390,7 +390,8 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Credits
 
-ActiveInteraction::Extras is brought to you by [Anton Katunin](https://github.com/antulik) and was originally built at [CarNextDoor](https://www.carnextdoor.com.au/).
+* ActiveInteraction::Extras is brought to you by [Anton Katunin](https://github.com/antulik) and was originally built at [CarNextDoor](https://www.carnextdoor.com.au/).
+* Further improvements to this gem brought to you by [Anton Katunin](https://github.com/antulik) once again and the [Split Payments team](https://github.com/splitpayments/split).
 
 ## Code of Conduct
 
