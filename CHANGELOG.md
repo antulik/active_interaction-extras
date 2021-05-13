@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.1] - 2021-05-13
+
+- Fix `run_in_transaction` in ruby 3 [#8](https://github.com/antulik/active_interaction-extras/pull/8)
+
 ## [1.0.0] - 2021-05-12
 
 - Requires active_interaction v4
