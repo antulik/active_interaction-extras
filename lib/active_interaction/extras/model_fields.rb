@@ -64,7 +64,23 @@ module ActiveInteraction::Extras::ModelFields
   end
 
   # overwritten to pre-populate model fields
-  def populate_filters(_inputs)
+  # DEPRECATED: Only used in ActiveInteraction <= 4.0.1
+  def populate_filters(inputs)
+    super.tap do
+      self.class.filters.each do |name, filter|
+        next if given?(name)
+
+        model_field = self.class.model_field_cache_inverse[name]
+        next if model_field.nil?
+
+        value = public_send(model_field)&.public_send(name)
+        public_send("#{name}=", filter.clean(value, self))
+      end
+    end
+  end
+
+  # overwritten to pre-populate model fields
+  def populate_filters_and_inputs(_inputs)
     super.tap do
       self.class.filters.each do |name, filter|
         next if given?(name)
