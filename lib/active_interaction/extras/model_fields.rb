@@ -46,6 +46,10 @@ module ActiveInteraction::Extras::ModelFields
     alias file custom_filter_attribute
     alias boolean custom_filter_attribute
     alias array custom_filter_attribute
+    alias record custom_filter_attribute
+
+    alias anything custom_filter_attribute
+    alias uuid custom_filter_attribute
   end
 
   # checks if value was given to the service and the value is different from
@@ -64,7 +68,7 @@ module ActiveInteraction::Extras::ModelFields
   end
 
   # overwritten to pre-populate model fields
-  def populate_filters(_inputs)
+  def populate_filters_and_inputs(_inputs)
     super.tap do
       self.class.filters.each do |name, filter|
         next if given?(name)

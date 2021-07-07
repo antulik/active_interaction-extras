@@ -38,8 +38,7 @@ RSpec.describe ActiveInteraction::Extras::ModelFields do
         expect(result).to be_nil
       end
 
-      # extension of nil conversion
-      xit 'sets empty string to nil' do
+      it 'sets empty string to nil' do
         model = double('Model', date_field: Date.today)
         result = test_form_class.run!(model: model, date_field: '')
 

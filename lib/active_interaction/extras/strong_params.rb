@@ -1,7 +1,7 @@
 module ActiveInteraction::Extras::StrongParams
   extend ActiveSupport::Concern
 
-  def process_inputs(inputs)
+  def initialize(inputs = {})
     # TODO: whitelist :params and :form_params, so they could not be used as filters
     return super if self.class.filters.key?(:params) || self.class.filters.key?(:form_params)
 
