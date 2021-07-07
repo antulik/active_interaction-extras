@@ -1,37 +1,68 @@
 RSpec.describe ActiveInteraction::Extras::Transaction do
-  xdescribe 'run_in_transaction!' do
-    let(:klass) do
-      Class.new(TestableService) do
-        interface :x
+  before do
+    require 'active_record'
+
+    ActiveRecord::Base.establish_connection adapter: "sqlite3", database: ":memory:"
+
+    ActiveRecord::Schema.define do
+      self.verbose = false
+
+      create_table :users, :force => true do |t|
+        t.string :name
+        t.timestamps
+      end
+    end
+
+    stub_const('User', Class.new(ActiveRecord::Base))
+  end
+
+  describe 'run_in_transaction!' do
+    before do
+      stub_const('ServiceB', Class.new(TestableService) do
+        object :user
+
+        def execute
+          user.save!
+          errors.add :base, 'nope'
+        end
+      end)
+
+      stub_const('ServiceA', Class.new(TestableService) do
+        object :user
         run_in_transaction!
 
         def execute
-          compose self.class.composable_class, x: x
+          user.name = 'changed_name'
+          compose ServiceB, user: user
         end
-
-        def self.composable_class
-          Class.new(TestableService) do
-            interface :x
-
-            def execute
-              x.save
-              errors.add :base, 'nope'
-            end
-          end
-        end
-      end
+      end)
     end
 
     context 'composable interactions' do
       it 'rollbacks when composable failed' do
-        group = create(:exclusive_group)
+        user = User.create!(name: 'name')
 
-        group.name = 'changed_name'
-        outcome = klass.run(x: group)
+        outcome = ServiceA.run(user: user)
 
         expect(outcome).to be_invalid
-        group.reload
-        expect(group.name).to_not eq 'changed_name'
+        expect(user.reload.name).to eq 'name'
+      end
+    end
+
+    describe 'skip_run_in_transaction!' do
+      before do
+        stub_const('ServiceNoTransaction', Class.new(ServiceA) do
+          skip_run_in_transaction!
+        end)
+      end
+
+      it 'does not run in transaction' do
+        user = User.create!(name: 'name')
+
+        outcome = ServiceNoTransaction.run(user: user)
+
+        expect(outcome).to be_invalid
+        expect(user.reload.name).to eq 'changed_name'
       end
     end
   end

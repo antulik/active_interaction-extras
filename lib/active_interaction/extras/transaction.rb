@@ -9,6 +9,7 @@ module ActiveInteraction::Extras::Transaction
     set_callback :execute, :around, ->(_interaction, block) {
       ActiveRecord::Base.transaction(**run_in_transaction_options) do
         block.call
+        raise ActiveRecord::Rollback if _interaction.errors.any?
       end
     }, if: :run_in_transaction_options
   end
