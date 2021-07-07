@@ -4,7 +4,9 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
-- Updated minimum required version to v4.0.2
+## [1.0.2] - 2021-07-07
+
+- Requires active_interaction v4.0.2 or higher
 - Fixed `run_in_transaction!` to rollback when interaction finished with errors
 
 ## [1.0.1] - 2021-05-13
