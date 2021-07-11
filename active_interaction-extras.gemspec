@@ -25,10 +25,13 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "active_interaction", ">= 4.0.2"
-  spec.add_dependency "rails", ">= 6.0"
+  spec.add_dependency "activemodel", ">= 6.0"
+  spec.add_dependency "activesupport", ">= 6.0"
+
   spec.add_development_dependency "bundler", "~> 2.2"
   spec.add_development_dependency "rake", ">= 12.3.3"
   spec.add_development_dependency "rspec", "~> 3.7"
   spec.add_development_dependency "pry"
   spec.add_development_dependency "sqlite3"
+  spec.add_development_dependency "activerecord"
 end

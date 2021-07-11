@@ -4,6 +4,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+- Loosen the gem requirements
+
 ## [1.0.2] - 2021-07-07
 
 - Requires active_interaction v4.0.2 or higher
