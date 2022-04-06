@@ -1,16 +1,19 @@
 module ActiveInteraction::Extras::Halt
   extend ActiveSupport::Concern
 
+  THROW_OBJECT = Object.new.freeze
+  private_constant :THROW_OBJECT
+
   included do
     set_callback :execute, :around, lambda { |_interaction, block|
-      catch :strict_error do
+      catch THROW_OBJECT do
         block.call
       end
     }
   end
 
   def halt!
-    throw :strict_error, errors
+    throw THROW_OBJECT, errors
   end
 
   def halt_if_errors!
