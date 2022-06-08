@@ -4,6 +4,10 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.4] - 2022-06-08
+
+- Improve halt's robustness (https://github.com/antulik/active_interaction-extras/pull/13)
+
 ## [1.0.3] - 2021-07-11
 
 - Loosen the gem requirements
