@@ -1,3 +1,5 @@
+require "active_support/core_ext/object/with_options"
+
 module ActiveInteraction::Extras::ModelFields
   extend ActiveSupport::Concern
 
