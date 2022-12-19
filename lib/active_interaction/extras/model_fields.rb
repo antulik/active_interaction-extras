@@ -72,6 +72,8 @@ module ActiveInteraction::Extras::ModelFields
   # overwritten to pre-populate model fields
   def populate_filters_and_inputs(_inputs)
     super.tap do
+      @_interaction_inputs = ActiveInteraction::Inputs.new(@_interaction_inputs.dup)
+
       self.class.filters.each do |name, filter|
         next if given?(name)
 
@@ -79,8 +81,11 @@ module ActiveInteraction::Extras::ModelFields
         next if model_field.nil?
 
         value = public_send(model_field)&.public_send(name)
+        @_interaction_inputs[name] = value
         public_send("#{name}=", filter.clean(value, self))
       end
+
+      @_interaction_inputs.freeze
     end
   end
 
