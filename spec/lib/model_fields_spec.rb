@@ -15,34 +15,30 @@ RSpec.describe ActiveInteraction::Extras::ModelFields do
     end
 
     describe '#model_fields' do
-      context 'new object' do
-        it 'prepopulates fields' do
-          model = double('Model', date_field: Date.today)
-          result = test_form_class.new(model: model)
+      subject(:model_fields) { interaction.model_fields(:model) }
 
-          expect(result.date_field).to eq Date.today
+      let(:interaction) { test_form_class.new(**interaction_args) }
+      let(:interaction_args) { {model: model} }
+      let(:model) { double('Model', date_field: Date.today) }
+
+      it 'returns values from given model' do
+        expect(model_fields).to eq(date_field: Date.today)
+      end
+
+      context 'with nil value for model field argument' do
+        let(:interaction_args) { {model: model, date_field: nil} }
+
+        it 'sets model field value to nil' do
+          expect(model_fields).to eq(date_field: nil)
         end
       end
 
-      it 'prepopulates model fields' do
-        model = double('Model', date_field: Date.today)
-        result = test_form_class.run!(model: model)
+      context 'with empty string value for model field argument' do
+        let(:interaction_args) { {model: model, date_field: ''} }
 
-        expect(result).to eq Date.today
-      end
-
-      it 'sets to nil' do
-        model = double('Model', date_field: Date.today)
-        result = test_form_class.run!(model: model, date_field: nil)
-
-        expect(result).to be_nil
-      end
-
-      it 'sets empty string to nil' do
-        model = double('Model', date_field: Date.today)
-        result = test_form_class.run!(model: model, date_field: '')
-
-        expect(result).to be_nil
+        it 'sets model field value to nil' do
+          expect(model_fields).to eq(date_field: nil)
+        end
       end
     end
 
