@@ -3,7 +3,10 @@ module ActiveInteraction::Extras::StrongParams
 
   def initialize(inputs = {})
     # TODO: whitelist :params and :form_params, so they could not be used as filters
-    return super if self.class.filters.key?(:params) || self.class.filters.key?(:form_params)
+    return super if
+      self.class.filters.key?(:params) ||
+      self.class.filters.key?(:form_params) ||
+      !%i[fetch key? merge].all? { |m| inputs.respond_to? m }
 
     if inputs.key?(:params) && inputs.key?(:form_params)
       raise ArgumentError, 'Both options :params and :form_params are given. ' \

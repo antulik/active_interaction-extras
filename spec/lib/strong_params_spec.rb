@@ -102,4 +102,10 @@ RSpec.describe ActiveInteraction::Extras::StrongParams do
       expect(ParentScope::TestService.run!(params)).to eq(a: 1, b: 2)
     end
   end
+
+  context 'with invalid inputs object type' do
+    it 'raises ArgumentError' do
+      expect { klass.run(Object.new) }.to raise_error(ArgumentError)
+    end
+  end
 end
