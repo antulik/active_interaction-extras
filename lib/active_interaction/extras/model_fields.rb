@@ -6,7 +6,9 @@ module ActiveInteraction::Extras::ModelFields
   # returns hash of all model fields and their values
   def model_fields(model_name)
     fields = self.class.model_field_cache[model_name]
-    inputs.slice(*fields)
+    fields.to_h do |field|
+      [field, public_send(field)]
+    end
   end
 
   # returns hash of only changed model fields and their values
