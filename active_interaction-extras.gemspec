@@ -17,6 +17,8 @@ Gem::Specification.new do |spec|
     "changelog_uri" => "https://github.com/antulik/active_interaction-extras/blob/master/CHANGELOG.md",
   }
 
+  spec.required_ruby_version = '>= 2.7'
+
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})
   end
