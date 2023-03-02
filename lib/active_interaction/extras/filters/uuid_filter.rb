@@ -10,6 +10,11 @@ class ActiveInteraction::Extras::Filters::UUIDFilter < ActiveInteraction::String
   end
 
   def convert(value)
-    super&.presence
+    value, error = super
+    if error
+      [value, error]
+    else
+      [value&.presence, nil]
+    end
   end
 end

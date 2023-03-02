@@ -51,14 +51,14 @@ RSpec.describe ActiveInteraction::Extras::ModelFields do
         model = double('Model', date_field: Date.today)
         form = test_form_class.new(model: model)
 
-        expect(form.given?(:model)).to be true
+        expect(form.inputs.given?(:model)).to be true
       end
 
       it 'is false for prepopulated fields' do
         model = double('Model', date_field: Date.today)
         form = test_form_class.new(model: model)
 
-        expect(form.given?(:date_field)).to be false
+        expect(form.inputs.given?(:date_field)).to be false
       end
     end
 

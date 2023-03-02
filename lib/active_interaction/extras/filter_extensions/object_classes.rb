@@ -29,6 +29,8 @@ module ActiveInteraction::Extras::FilterExtensions::ObjectClasses
 
   def matches?(value)
     if polymorphic?
+      return false if value == nil
+
       class_list.any? { |klass| value.class <= klass }
     else
       super

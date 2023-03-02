@@ -19,7 +19,7 @@ module ActiveInteraction::Extras::ModelFields
   # returns hash of only given model fields and their values
   def given_model_fields(model_name)
     model_fields(model_name).select do |field, _value|
-      given?(field)
+      inputs.given?(field)
     end
   end
 
@@ -65,22 +65,23 @@ module ActiveInteraction::Extras::ModelFields
         value_changed = send(model_field).send(field) != send(field)
       end
 
-      given?(field) && value_changed
+      inputs.given?(field) && value_changed
     end
   end
 
   # overwritten to pre-populate model fields
-  def populate_filters_and_inputs(_inputs)
-    super.tap do
-      self.class.filters.each do |name, filter|
-        next if given?(name)
+  def initialize(...)
+    super
 
-        model_field = self.class.model_field_cache_inverse[name]
-        next if model_field.nil?
+    self.class.filters.each do |name, filter|
+      next if inputs.given?(name)
 
-        value = public_send(model_field)&.public_send(name)
-        public_send("#{name}=", filter.clean(value, self))
-      end
+      model_field = self.class.model_field_cache_inverse[name]
+      next if model_field.nil?
+
+      value = public_send(model_field)&.public_send(name)
+      input = filter.process(value, self)
+      public_send("#{name}=", input.value)
     end
   end
 
