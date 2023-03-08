@@ -4,6 +4,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [1.1.0] - 2023-03-08
+
+- Add support for active_interaction v5
+- Fix `model_fields` helper
+
 ## [1.0.4] - 2022-06-08
 
 - Improve halt's robustness (https://github.com/antulik/active_interaction-extras/pull/13)
