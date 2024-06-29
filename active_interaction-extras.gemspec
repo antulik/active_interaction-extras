@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
     "changelog_uri" => "https://github.com/antulik/active_interaction-extras/blob/master/CHANGELOG.md",
   }
 
-  spec.required_ruby_version = '>= 2.7'
+  spec.required_ruby_version = '>= 3.0'
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
     f.match(%r{^(test|spec|features)/})
@@ -27,14 +27,14 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "active_interaction", ">= 5.0", "< 6.0"
-  spec.add_dependency "activemodel", ">= 6.0"
+  spec.add_dependency "activemodel", ">= 7.1"
   spec.add_dependency "activesupport", ">= 7.1"
 
   spec.add_development_dependency "bundler", "~> 2.2"
   spec.add_development_dependency "rake", ">= 12.3.3"
   spec.add_development_dependency "rspec", "~> 3.7"
   spec.add_development_dependency "pry"
-  spec.add_development_dependency "sqlite3"
+  spec.add_development_dependency "sqlite3", "< 2"
   spec.add_development_dependency "activerecord"
   spec.add_development_dependency "activejob"
   spec.add_development_dependency "actionpack"
