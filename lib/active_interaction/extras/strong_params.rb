@@ -35,7 +35,7 @@ module ActiveInteraction::Extras::StrongParams
         case filter
         when ActiveInteraction::ArrayFilter
           { filter_name => [] }
-        when ActiveInteraction::HashFilter
+        when ActiveInteraction::HashFilter, ActiveInteraction::ObjectFilter
           { filter_name => {} }
         else
           filter_name
