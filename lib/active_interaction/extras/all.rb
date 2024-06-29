@@ -9,4 +9,9 @@ module ActiveInteraction::Extras::All
   include ActiveInteraction::Extras::ModelFields
   include ActiveInteraction::Extras::RunCallback
   include ActiveInteraction::Extras::StrongParams
+
+  include ActiveInteraction::Extras::FormFor
+  include ActiveInteraction::Extras::AfterInitialize
+  include ActiveInteraction::Extras::InitializeWith
+
 end
