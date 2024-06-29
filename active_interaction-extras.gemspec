@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "active_interaction", ">= 5.0", "< 6.0"
   spec.add_dependency "activemodel", ">= 6.0"
-  spec.add_dependency "activesupport", ">= 6.0"
+  spec.add_dependency "activesupport", ">= 7.1"
 
   spec.add_development_dependency "bundler", "~> 2.2"
   spec.add_development_dependency "rake", ">= 12.3.3"
