@@ -7,6 +7,7 @@ module ActiveInteraction::Extras::All
   include ActiveInteraction::Extras::FilterAlias
   include ActiveInteraction::Extras::Halt
   include ActiveInteraction::Extras::ModelFields
+  include ActiveInteraction::Extras::NestedAttributes
   include ActiveInteraction::Extras::RunCallback
   include ActiveInteraction::Extras::StrongParams
 

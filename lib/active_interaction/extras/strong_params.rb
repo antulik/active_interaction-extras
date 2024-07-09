@@ -29,18 +29,47 @@ module ActiveInteraction::Extras::StrongParams
 
   class_methods do
     def permitted_params
-      filters.map do |filter_name, filter|
-        next unless filter.options[:permit]
+      permissions = filters.map do |filter_name, filter|
+        [
+          permission_for_filter(filter, filter_name),
+          # (permission_for_filter(filter, filter.options[:as]) if filter.options[:as])
+        ]
+      end.flatten(1).compact
 
-        case filter
-        when ActiveInteraction::ArrayFilter
-          { filter_name => [] }
-        when ActiveInteraction::HashFilter, ActiveInteraction::ObjectFilter
-          { filter_name => {} }
-        else
-          filter_name
+      if respond_to?(:nested_attribute_options)
+        nested_attribute_options.each do |attribute, _|
+          permissions << {"#{attribute}_attributes": {}}
         end
-      end.compact
+      end
+
+      permissions
+    end
+
+    def permission_for_filter(filter, name = filter.name)
+      permit = filter.options[:permit]
+      return unless permit
+
+      case filter
+      when ActiveInteraction::ArrayFilter
+        value =
+          if permit == true
+            nested_type = filter.filters.values.first
+            case nested_type
+            when ActiveInteraction::HashFilter, ActiveInteraction::ObjectFilter
+              {}
+            else
+              []
+            end
+          else
+            permit
+          end
+
+        { name => value }
+      when ActiveInteraction::HashFilter, ActiveInteraction::ObjectFilter
+        { name => {} }
+      else
+        name
+      end
     end
   end
 end
