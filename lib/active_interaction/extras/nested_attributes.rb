@@ -4,14 +4,16 @@ module ActiveInteraction::Extras::NestedAttributes
 
   concern :InputsExtension do
     def normalize(inputs)
-      @base.class.nested_attribute_options.each do |attribute, options|
-        alias_name = "#{attribute}_attributes"
-        next if !inputs.key?(alias_name) && !inputs.key?(alias_name.to_sym)
+      if @base.class.respond_to? :nested_attribute_options
+        @base.class.nested_attribute_options.each do |attribute, options|
+          alias_name = "#{attribute}_attributes"
+          next if !inputs.key?(alias_name) && !inputs.key?(alias_name.to_sym)
 
-        value = inputs[alias_name] || inputs[alias_name.to_sym]
-        value = @base.class.process_nested_collection(value, options)
+          value = inputs[alias_name] || inputs[alias_name.to_sym]
+          value = @base.class.process_nested_collection(value, options)
 
-        inputs[attribute.to_s] = value
+          inputs[attribute.to_s] = value
+        end
       end
 
       super
