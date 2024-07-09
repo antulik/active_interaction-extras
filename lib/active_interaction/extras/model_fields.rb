@@ -29,11 +29,11 @@ module ActiveInteraction::Extras::ModelFields
     attr_accessor :from_model_name
     attr_accessor :model_field_cache
 
-    def custom_filter_attribute(name, opts = {})
+    def custom_filter_attribute(name, opts = {}, &block)
       from_model_name = self.from_model_name
       model_field_cache[from_model_name] = model_field_cache[from_model_name] << name
 
-      __getobj__.send __callee__, name, opts
+      __getobj__.send __callee__, name, opts, &block
     end
 
     alias interface custom_filter_attribute
