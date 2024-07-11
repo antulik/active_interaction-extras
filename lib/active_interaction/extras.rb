@@ -23,6 +23,7 @@ module ActiveInteraction
     autoload(:FilterAlias, "active_interaction/extras/filter_alias")
     autoload(:Halt, "active_interaction/extras/halt")
     autoload(:ModelFields, "active_interaction/extras/model_fields")
+    autoload(:NamedCallbacks, "active_interaction/extras/named_callbacks")
     autoload(:NestedAttributes, "active_interaction/extras/nested_attributes")
     autoload(:RunCallback, "active_interaction/extras/run_callback")
     autoload(:StrongParams, "active_interaction/extras/strong_params")

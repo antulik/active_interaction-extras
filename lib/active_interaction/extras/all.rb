@@ -2,6 +2,7 @@ module ActiveInteraction::Extras::All
   extend ActiveSupport::Concern
 
   # order dependant, include first so around callback includes other modules
+  include ActiveInteraction::Extras::NamedCallbacks
   include ActiveInteraction::Extras::Transaction
 
   include ActiveInteraction::Extras::FilterAlias
