@@ -2,7 +2,6 @@ require 'active_job'
 
 module ActiveInteraction::Extras::ActiveJob
   extend ActiveSupport::Concern
-
   include ActiveInteraction::Extras::Jobs::Core
 
   class_methods do
@@ -15,10 +14,12 @@ module ActiveInteraction::Extras::ActiveJob
     extend ActiveSupport::Concern
 
     def perform(*args)
-      if self.class.respond_to?(:module_parent)
-        self.class.module_parent.run!(*args)
-      else
-        self.class.parent.run!(*args)
+      ActiveInteraction::Extras::Current::CurrentContext.set(job: self) do
+        if self.class.respond_to?(:module_parent)
+          self.class.module_parent.run!(*args)
+        else
+          self.class.parent.run!(*args)
+        end
       end
     end
   end

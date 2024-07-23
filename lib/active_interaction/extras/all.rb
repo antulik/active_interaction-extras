@@ -11,6 +11,7 @@ module ActiveInteraction::Extras::All
   include ActiveInteraction::Extras::NestedAttributes
   include ActiveInteraction::Extras::RunCallback
   include ActiveInteraction::Extras::StrongParams
+  include ActiveInteraction::Extras::Current
 
   include ActiveInteraction::Extras::FormFor
   include ActiveInteraction::Extras::AfterInitialize

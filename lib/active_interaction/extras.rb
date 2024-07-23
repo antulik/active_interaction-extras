@@ -20,6 +20,7 @@ module ActiveInteraction
 
     autoload(:All, "active_interaction/extras/all")
 
+    autoload(:Current, "active_interaction/extras/current")
     autoload(:FilterAlias, "active_interaction/extras/filter_alias")
     autoload(:Halt, "active_interaction/extras/halt")
     autoload(:ModelFields, "active_interaction/extras/model_fields")
