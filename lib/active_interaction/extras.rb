@@ -34,6 +34,7 @@ module ActiveInteraction
     autoload(:Rspec, "active_interaction/extras/rspec")
 
     autoload(:ActiveJob, "active_interaction/extras/active_job")
+    autoload(:GoodJob, "active_interaction/extras/good_job")
     autoload(:Sidekiq, "active_interaction/extras/sidekiq")
 
     concern :FormFor do
