@@ -18,6 +18,22 @@ module ActiveInteraction::Extras::ModelFields
     end
   end
 
+  def save_model!(model_name)
+    model = public_send(model_name)
+    model.assign_attributes(model_fields(model_name))
+    model.save
+    include_errors! model
+    model
+  end
+
+  def save_model_changes!(model_name)
+    model = public_send(model_name)
+    model.assign_attributes(changed_model_fields(model_name))
+    model.save
+    include_errors! model
+    model
+  end
+
   # returns hash of only given model fields and their values
   def given_model_fields(model_name)
     model_fields(model_name).select do |field, _value|
