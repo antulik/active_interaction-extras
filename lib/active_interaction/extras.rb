@@ -53,8 +53,8 @@ module ActiveInteraction
       end
 
       class_methods do
-        def after_initialize(&block)
-          set_callback :initialize, :after, &block
+        def after_initialize(...)
+          set_callback(:initialize, :after, ...)
         end
       end
 
