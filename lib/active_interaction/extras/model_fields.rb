@@ -2,6 +2,42 @@ require "active_support/core_ext/object/with_options"
 
 module ActiveInteraction::Extras::ModelFields
   extend ActiveSupport::Concern
+  include ActiveInteraction::Extras::AfterInitialize
+
+  class Context < SimpleDelegator
+    attr_accessor :from_model_name
+    attr_accessor :model_field_cache
+
+    def custom_filter_attribute(name, opts = {}, &block)
+      from_model_name = self.from_model_name
+      model_field_cache[from_model_name] = model_field_cache[from_model_name] << name
+
+      __getobj__.send __callee__, name, opts, &block
+    end
+
+    alias interface custom_filter_attribute
+    alias date custom_filter_attribute
+    alias time custom_filter_attribute
+    alias date_time custom_filter_attribute
+    alias integer custom_filter_attribute
+    alias decimal custom_filter_attribute
+    alias float custom_filter_attribute
+    alias string custom_filter_attribute
+    alias symbol custom_filter_attribute
+    alias object custom_filter_attribute
+    alias hash custom_filter_attribute
+    alias file custom_filter_attribute
+    alias boolean custom_filter_attribute
+    alias array custom_filter_attribute
+    alias record custom_filter_attribute
+
+    alias anything custom_filter_attribute
+    alias uuid custom_filter_attribute
+  end
+
+  included do
+    after_initialize :assign_model_values_to_filters
+  end
 
   # returns hash of all model fields and their values
   def model_fields(model_name)
@@ -41,56 +77,23 @@ module ActiveInteraction::Extras::ModelFields
     end
   end
 
-  class Context < SimpleDelegator
-    attr_accessor :from_model_name
-    attr_accessor :model_field_cache
-
-    def custom_filter_attribute(name, opts = {}, &block)
-      from_model_name = self.from_model_name
-      model_field_cache[from_model_name] = model_field_cache[from_model_name] << name
-
-      __getobj__.send __callee__, name, opts, &block
-    end
-
-    alias interface custom_filter_attribute
-    alias date custom_filter_attribute
-    alias time custom_filter_attribute
-    alias date_time custom_filter_attribute
-    alias integer custom_filter_attribute
-    alias decimal custom_filter_attribute
-    alias float custom_filter_attribute
-    alias string custom_filter_attribute
-    alias symbol custom_filter_attribute
-    alias object custom_filter_attribute
-    alias hash custom_filter_attribute
-    alias file custom_filter_attribute
-    alias boolean custom_filter_attribute
-    alias array custom_filter_attribute
-    alias record custom_filter_attribute
-
-    alias anything custom_filter_attribute
-    alias uuid custom_filter_attribute
-  end
-
   # checks if value was given to the service and the value is different from
   # the one on the model
   def any_changed?(*fields)
     fields.any? do |field|
-      model_field = self.class.model_field_cache_inverse[field]
-      value_changed = true
+      if inputs.given?(field)
+        model_field = self.class.model_field_cache_inverse[field]
 
-      if model_field
-        value_changed = send(model_field).send(field) != send(field)
+        if model_field
+          send(model_field).send(field) != send(field)
+        else
+          true
+        end
       end
-
-      inputs.given?(field) && value_changed
     end
   end
 
-  # overwritten to pre-populate model fields
-  def initialize(...)
-    super
-
+  def assign_model_values_to_filters
     self.class.filters.each do |name, filter|
       next if inputs.given?(name)
 

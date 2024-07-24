@@ -3,6 +3,7 @@ module ActiveInteraction::Extras::All
 
   # order dependant, include first so around callback includes other modules
   include ActiveInteraction::Extras::NamedCallbacks
+  include ActiveInteraction::Extras::AfterInitialize
   include ActiveInteraction::Extras::Transaction
 
   include ActiveInteraction::Extras::FilterAlias
@@ -14,7 +15,6 @@ module ActiveInteraction::Extras::All
   include ActiveInteraction::Extras::Current
 
   include ActiveInteraction::Extras::FormFor
-  include ActiveInteraction::Extras::AfterInitialize
   include ActiveInteraction::Extras::InitializeWith
   include ActiveInteraction::Extras::IncludeErrors
 
