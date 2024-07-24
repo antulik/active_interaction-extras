@@ -4,6 +4,7 @@ module ActiveInteraction::Extras::Current
   class CurrentContext < ActiveSupport::CurrentAttributes
     attribute :job
     attribute :batch_event
+    attribute :batch
   end
 
   def current

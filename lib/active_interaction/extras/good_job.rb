@@ -6,12 +6,9 @@ module ActiveInteraction::Extras::GoodJob
 
   module BatchJobPerform
     def perform(batch, options)
-      job_klass = batch.properties[:job_klass]
-      job_klass_params = batch.properties[:job_klass_params]
-
       ActiveInteraction::Extras::Current::CurrentContext
-        .set(batch_event: options[:event]) do
-        job_klass.constantize.perform_now(job_klass_params)
+        .set(batch:, batch_event: options[:event]) do
+        super(batch.properties)
       end
     end
   end
@@ -36,14 +33,11 @@ module ActiveInteraction::Extras::GoodJob
       end
     end
 
-    def batch_job(job_klass_params)
+    def batch_job(job_params)
       batch = GoodJob::Batch.new
       batch.description = self.name
       batch.on_finish = self::BatchJob.name
-      batch.properties = {
-        job_klass: self.job_class.name,
-        job_klass_params:
-      }
+      batch.properties = job_params
       batch
     end
   end
