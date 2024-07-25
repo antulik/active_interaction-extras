@@ -101,21 +101,28 @@ RSpec.describe ActiveInteraction::Extras::ModelFields do
 
     describe '#any_changed?' do
       it 'is false if value has not changed' do
-        model = double('Model', date_field: Date.today)
+        model = double('Model', date_field: Date.today, new_record?: false)
         form = test_form_class.new(model: model, date_field: Date.today)
 
         expect(form.any_changed?(:date_field)).to be false
       end
 
+      it 'is true if new record' do
+        model = double('Model', date_field: Date.today, new_record?: true)
+        form = test_form_class.new(model: model, date_field: Date.today)
+
+        expect(form.any_changed?(:date_field)).to be true
+      end
+
       it 'is true when value changed' do
-        model = double('Model', date_field: Date.today)
+        model = double('Model', date_field: Date.today, new_record?: false)
         form = test_form_class.new(model: model, date_field: Date.tomorrow)
 
         expect(form.any_changed?(:date_field)).to be true
       end
 
       it 'is true when value is cleared' do
-        model = double('Model', date_field: Date.today)
+        model = double('Model', date_field: Date.today, new_record?: false)
         form = test_form_class.new(model: model, date_field: nil)
 
         expect(form.any_changed?(:date_field)).to be true
