@@ -81,14 +81,18 @@ module ActiveInteraction::Extras::ModelFields
   # the one on the model
   def any_changed?(*fields)
     fields.any? do |field|
-      if inputs.given?(field)
-        model_field = self.class.model_field_cache_inverse[field]
-
-        if model_field
-          send(model_field).send(field) != send(field)
-        else
+      model_field = self.class.model_field_cache_inverse[field]
+      if model_field
+        model = send(model_field)
+        if model.new_record?
           true
+        elsif inputs.given?(field)
+          model.send(field) != send(field)
+        else
+          false
         end
+      else
+        inputs.given?(field)
       end
     end
   end
