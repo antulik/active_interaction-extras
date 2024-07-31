@@ -5,6 +5,10 @@ module ActiveInteraction::Extras::Current
     attribute :job
     attribute :batch_event
     attribute :batch
+
+    def batch
+      super || job&.batch
+    end
   end
 
   def current
