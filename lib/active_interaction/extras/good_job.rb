@@ -41,15 +41,4 @@ module ActiveInteraction::Extras::GoodJob
       batch
     end
   end
-
-  class MyBatchCallbackJob < ApplicationJob
-    def perform(batch, options)
-      job_klass = batch.properties[:job_klass]
-      job_klass_params = batch.properties[:job_klass_params]
-
-      ActiveInteraction::Extras::Current::CurrentContext.set(batch_event: options[:event]) do
-        job_klass.constantize.perform_now(job_klass_params)
-      end
-    end
-  end
 end
