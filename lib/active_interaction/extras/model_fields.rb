@@ -84,7 +84,7 @@ module ActiveInteraction::Extras::ModelFields
       model_field = self.class.model_field_cache_inverse[field]
       if model_field
         model = send(model_field)
-        if model.new_record?
+        if model.respond_to?(:new_record?) && model.new_record?
           true
         elsif inputs.given?(field)
           model.send(field) != send(field)
