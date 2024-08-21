@@ -13,6 +13,7 @@ module ActiveInteraction::Extras::GoodJob
     end
   end
 
+  # Note: Should include GoodJob::ActiveJobExtensions::Concurrency before this
   module Perform
     extend ActiveSupport::Concern
     include ActiveInteraction::Extras::ActiveJob::Perform
