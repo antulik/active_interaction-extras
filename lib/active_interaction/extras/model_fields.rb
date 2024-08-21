@@ -87,6 +87,8 @@ module ActiveInteraction::Extras::ModelFields
         if model.respond_to?(:new_record?) && model.new_record?
           true
         elsif inputs.given?(field)
+          # NOTE: this causes bug when form attribute was manually changed, but `inputs.given?` is false
+          # change won't be detected
           model.send(field) != send(field)
         else
           false
