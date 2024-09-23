@@ -71,7 +71,7 @@ module ActiveInteraction
         def initialize_with(&block)
           after_initialize do
             hash = instance_exec(&block)
-            hash.each do |filter_name, value|
+            hash&.each do |filter_name, value|
               public_send "#{filter_name}=", value if !inputs.given?(filter_name)
             end
           end
