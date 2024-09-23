@@ -31,6 +31,14 @@ module ActiveInteraction::Extras::NestedAttributes
       options = attributes.extract_options!
       options.reverse_merge!(allow_destroy: false, update_only: false)
 
+      if options.key?(:permit)
+        if options[:permit].is_a?(Array)
+          options[:permit] |= [:id, :_destroy]
+        end
+      else
+        raise ArgumentError, "missing :permit option"
+      end
+
       attributes.each do |attribute|
         nested_attribute_options[attribute] = options
 
@@ -38,7 +46,10 @@ module ActiveInteraction::Extras::NestedAttributes
         when ActiveInteraction::ArrayFilter
           define_association_setter_for_many attribute, options
         else
-          raise "Nested attributes are not supported for single object"
+          define_association_setter_for_single(attribute, options)
+          define_method "#{attribute}_attributes=" do |*args, **kwargs|
+            send("#{attribute}=", *args, **kwargs)
+          end
         end
       end
     end
@@ -50,9 +61,20 @@ module ActiveInteraction::Extras::NestedAttributes
       end
     end
 
+    def define_association_setter_for_single(association, options)
+      return unless options&.dig(:allow_destroy)
+
+      define_method "#{association}=" do |attributes|
+        if ActiveRecord::Type::Boolean.new.cast(attributes.stringify_keys.dig("_destroy"))
+          super(nil)
+        else
+          super(attributes)
+        end
+      end
+    end
+
     def process_nested_collection(attributes, options = nil)
       attributes = attributes.values if attributes.is_a?(Hash)
-
       if options&.dig(:allow_destroy)
         attributes.reject! do |attribute|
           ActiveRecord::Type::Boolean.new.cast(attribute.stringify_keys.dig("_destroy"))
@@ -72,6 +94,30 @@ module ActiveInteraction::Extras::NestedAttributes
         method(callback).arity.zero? ? send(callback) : send(callback, attributes)
       when Proc
         callback.call(attributes)
+      end
+    end
+  end
+
+  def assign_collection_association(model, association_name, attributes_collection, destroy_missing: false, **options)
+
+    if attributes_collection.is_a?(ActiveRecord::Associations::CollectionProxy)
+      return attributes_collection
+    end
+
+    model.instance_exec do
+      begin
+        old_options = nested_attributes_options[association_name]
+        nested_attributes_options[association_name] = options
+
+        list = assign_nested_attributes_for_collection_association(association_name, attributes_collection)
+
+        if destroy_missing
+          association(association_name).scope.excluding(list).each(&:destroy!)
+        end
+
+        list
+      ensure
+        nested_attributes_options[association_name] = old_options
       end
     end
   end

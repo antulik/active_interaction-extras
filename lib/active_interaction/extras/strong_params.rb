@@ -37,8 +37,9 @@ module ActiveInteraction::Extras::StrongParams
       end.flatten(1).compact
 
       if respond_to?(:nested_attribute_options)
-        nested_attribute_options.each do |attribute, _|
-          permissions << {"#{attribute}_attributes": {}}
+        nested_attribute_options.each do |attribute, opts|
+          permitted_list = opts.fetch(:permit)
+          permissions << {"#{attribute}_attributes": permitted_list}
         end
       end
 
