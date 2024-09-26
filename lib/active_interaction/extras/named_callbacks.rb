@@ -27,6 +27,17 @@ module ActiveInteraction::Extras::NamedCallbacks
       set_callback(:validate, :around, ...)
     end
 
+    def before_validation(...)
+      before_validate(...)
+    end
+
+    def after_validation(...)
+      after_validate(...)
+    end
+
+    def around_validation(...)
+      around_validate(...)
+    end
 
     def before_execute(...)
       set_callback(:execute, :before, ...)
