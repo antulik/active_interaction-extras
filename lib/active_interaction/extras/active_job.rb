@@ -8,6 +8,10 @@ module ActiveInteraction::Extras::ActiveJob
     def configured_job_class
       ConfiguredJob
     end
+
+    def perform_now(&block)
+      job_class.perform_now(&block)
+    end
   end
 
   module Perform
@@ -22,15 +26,37 @@ module ActiveInteraction::Extras::ActiveJob
         end
       end
     end
+
+    class_methods do
+      def perform_now
+        Thread.current[name] ||= []
+        Thread.current[name].push true
+        yield
+      ensure
+        if Thread.current[name].size == 1
+          Thread.current[name] = nil
+        else
+          Thread.current[name].pop
+        end
+      end
+
+      def perform_now?
+        Thread.current[name]
+      end
+    end
   end
 
   class ConfiguredJob < ::ActiveJob::ConfiguredJob
     def run(*args)
-      perform_later(*args)
+      run!(*args)
     end
 
     def run!(*args)
-      perform_later(*args)
+      if @job_class.perform_now?
+        perform_now(*args)
+      else
+        perform_later(*args)
+      end
     end
   end
 end
