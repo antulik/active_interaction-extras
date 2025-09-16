@@ -111,6 +111,7 @@ module ActiveInteraction
 end
 
 require 'active_interaction/extras/filters/anything_filter'
+require 'active_interaction/extras/filters/ar_relation_filter'
 require 'active_interaction/extras/filters/uuid_filter'
 
 I18n.load_path.unshift(
