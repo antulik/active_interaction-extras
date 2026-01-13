@@ -122,7 +122,7 @@ module ActiveInteraction
         end
 
         def run!(opts = {})
-          execute(opts) { klass.run!(_1) }
+          execute(opts) { klass.run!(_1) } 
         end
 
         def delay(**delay_opts)
@@ -171,7 +171,8 @@ module ActiveInteraction
         end
 
         def run(opts = {})
-          around = GoodJob::Bulk.method(:enqueue)
+          require 'good_job'
+          around = ::GoodJob::Bulk.method(:enqueue)
           execute(opts, around:) { klass.delay(delay_opts).run(_1) }
         end
 
