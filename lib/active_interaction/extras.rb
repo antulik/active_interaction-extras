@@ -187,6 +187,86 @@ module ActiveInteraction
         end
       end
     end
+
+
+    concern :AppendInputs do
+      module InputsRefinement
+        refine ActiveInteraction::Inputs do
+          # Based on ActiveInteraction::Inputs#initialize
+          def append(raw_inputs, overwrite: false)
+            new_normalized_inputs = normalize(raw_inputs)
+
+            keys = new_normalized_inputs.keys.map(&:to_sym)
+            keys = keys.reject { given?(_1) } if !overwrite
+
+            new_inputs = @base.class.filters
+              .slice(*keys)
+              .each_with_object({}) do |(name, filter), inputs|
+              inputs[name] = filter.process(new_normalized_inputs[name], @base)
+
+              yield(name, inputs[name]) if block_given?
+            end
+
+            @normalized_inputs = @normalized_inputs.merge(new_normalized_inputs)
+            @inputs = @inputs.merge(new_inputs)
+            @to_h = nil
+          end
+        end
+      end
+
+      using InputsRefinement
+
+      def default_inputs(*args)
+        inputs.append(*args) do |name, input|
+          public_send("#{name}=", input.value)
+        end
+      end
+
+      # def default_input(name, &block)
+      #   if !inputs.given?(name)
+      #     default_inputs(name: block.call)
+      #   end
+      # end
+
+      class_methods do
+        def default_inputs(&block)
+          after_initialize do
+            hash = block.call
+            default_inputs(hash)
+          end
+        end
+
+        def default_input(name, &block)
+          after_initialize do
+            default_inputs(name => instance_exec(&block))
+          end
+        end
+      end
+    end
+
+    concern :FileBlobs do
+      def blobs_for(array_field)
+        # If there is a new upload field, prioritize it
+        new_upload = "new_#{array_field}"
+        if respond_to?(new_upload) && public_send(new_upload).present?
+          array_field = new_upload
+        end
+
+        list = public_send(array_field)
+        list = Array.wrap(list)
+
+        list.compact_blank.map do |file|
+          case file
+          when ActiveStorage::Blob
+            file
+          when ActiveStorage::Attachment, ActiveStorage::Attached::One
+            file.blob
+          when String
+            ActiveStorage::Blob.find_signed(file)
+          end
+        end.compact
+      end
+    end
   end
 end
 

@@ -18,5 +18,7 @@ module ActiveInteraction::Extras::All
   include ActiveInteraction::Extras::InitializeWith
   include ActiveInteraction::Extras::IncludeErrors
   include ActiveInteraction::Extras::AllRunner
+  include ActiveInteraction::Extras::AppendInputs
+  include ActiveInteraction::Extras::FileBlobs
 
 end
