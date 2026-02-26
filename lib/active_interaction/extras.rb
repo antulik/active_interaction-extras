@@ -62,6 +62,7 @@ module ActiveInteraction
     concern :InstanceRunnable do
       def save
         run
+        valid?
       end
 
       def save!

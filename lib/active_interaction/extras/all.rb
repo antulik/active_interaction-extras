@@ -10,7 +10,7 @@ module ActiveInteraction::Extras::All
   include ActiveInteraction::Extras::Halt
   include ActiveInteraction::Extras::ModelFields
   include ActiveInteraction::Extras::NestedAttributes
-  include ActiveInteraction::Extras::RunCallback
+
   include ActiveInteraction::Extras::StrongParams
   include ActiveInteraction::Extras::Current
 
@@ -22,4 +22,5 @@ module ActiveInteraction::Extras::All
   include ActiveInteraction::Extras::AppendInputs
   include ActiveInteraction::Extras::FileBlobs
 
+  include ActiveInteraction::Extras::RunCallback
 end
