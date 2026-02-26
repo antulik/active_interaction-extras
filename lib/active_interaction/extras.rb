@@ -41,6 +41,16 @@ module ActiveInteraction
       class_methods do
         def form_for(field_name)
           delegate :persisted?, :id, :to_param, to: field_name
+
+          if filters.key?(field_name)
+            klass = filters.fetch(field_name).send(:klass)
+            model_name.route_key = klass.model_name.route_key
+            model_name.singular_route_key = klass.model_name.singular_route_key
+          end
+
+          Rails.application.routes.add_polymorphic_mapping(name, {}) do |form|
+            form.send(field_name)
+          end
         end
       end
     end
