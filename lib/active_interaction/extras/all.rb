@@ -15,6 +15,7 @@ module ActiveInteraction::Extras::All
   include ActiveInteraction::Extras::Current
 
   include ActiveInteraction::Extras::FormFor
+  include ActiveInteraction::Extras::InstanceRunnable
   include ActiveInteraction::Extras::InitializeWith
   include ActiveInteraction::Extras::IncludeErrors
   include ActiveInteraction::Extras::AllRunner

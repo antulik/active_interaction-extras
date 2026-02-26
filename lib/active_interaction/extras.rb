@@ -48,10 +48,32 @@ module ActiveInteraction
             model_name.singular_route_key = klass.model_name.singular_route_key
           end
 
+          # Resolve form object route to object
+          # e.g. resolve "User::Form" { |form| form.user }
           Rails.application.routes.add_polymorphic_mapping(name, {}) do |form|
             form.send(field_name)
           end
         end
+      end
+    end
+
+    # Allows Interaction.new.run
+    # Useful for controllers, so single object could be instantiated for new, create, edit, update
+    concern :InstanceRunnable do
+      def save
+        run
+      end
+
+      def save!
+        run!
+      end
+
+      def run
+        if @_executed
+          raise("Service already executed")
+        end
+        @_executed = true
+        super
       end
     end
 
