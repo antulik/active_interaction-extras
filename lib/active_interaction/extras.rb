@@ -50,8 +50,10 @@ module ActiveInteraction
 
           # Resolve form object route to object
           # e.g. resolve "User::Form" { |form| form.user }
-          Rails.application.routes.add_polymorphic_mapping(name, {}) do |form|
-            form.send(field_name)
+          Rails.application.config.after_routes_loaded do |app|
+            app.routes.add_polymorphic_mapping(name, {}) do |form|
+              form.send(field_name)
+            end
           end
         end
       end
