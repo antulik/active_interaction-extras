@@ -48,13 +48,14 @@ module ActiveInteraction
             model_name.singular_route_key = klass.model_name.singular_route_key
           end
 
+          # TODO: Routes reload is broken in Dev
           # Resolve form object route to object
           # e.g. resolve "User::Form" { |form| form.user }
-          Rails.application.config.after_routes_loaded do |app|
-            app.routes.add_polymorphic_mapping(name, {}) do |form|
-              form.send(field_name)
-            end
-          end
+          # Rails.application.config.after_routes_loaded do |app|
+          #   app.routes.add_polymorphic_mapping(name, {}) do |form|
+          #     form.send(field_name)
+          #   end
+          # end
         end
       end
     end
