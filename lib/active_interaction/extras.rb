@@ -144,6 +144,18 @@ module ActiveInteraction
       end
     end
 
+    concern :AddToBatch do
+      include ActiveInteraction::Extras::Current
+
+      def add_to_batch(&block)
+        if current.batch
+          current.batch.add(&block)
+        else
+          block.call
+        end
+      end
+    end
+
     concern :AllRunner do
       class AllExecution
         attr_reader :klass, :params
