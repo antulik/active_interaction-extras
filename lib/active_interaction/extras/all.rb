@@ -14,6 +14,7 @@ module ActiveInteraction::Extras::All
   include ActiveInteraction::Extras::StrongParams
   include ActiveInteraction::Extras::Current
 
+  include ActiveInteraction::Extras::AddToBatch
   include ActiveInteraction::Extras::FormFor
   include ActiveInteraction::Extras::InstanceRunnable
   include ActiveInteraction::Extras::InitializeWith
