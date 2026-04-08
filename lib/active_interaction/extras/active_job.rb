@@ -19,11 +19,15 @@ module ActiveInteraction::Extras::ActiveJob
 
     def perform(*args)
       ActiveInteraction::Extras::Current::CurrentContext.set(job: self) do
-        if self.class.respond_to?(:module_parent)
-          self.class.module_parent.run!(*args)
-        else
-          self.class.parent.run!(*args)
-        end
+        parent_class.run!(*args)
+      end
+    end
+
+    def parent_class
+      if self.class.respond_to?(:module_parent)
+        self.class.module_parent
+      else
+        self.class.parent
       end
     end
 
