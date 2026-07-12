@@ -9,6 +9,9 @@ require 'active_interaction'
 require 'zeitwerk'
 
 loader = Zeitwerk::Loader.for_gem_extension(ActiveInteraction)
+loader.inflector.inflect(
+  'uuid_filter' => 'UUIDFilter',
+)
 loader.setup
 
 module ActiveInteraction

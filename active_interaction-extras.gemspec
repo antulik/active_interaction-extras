@@ -31,11 +31,11 @@ Gem::Specification.new do |spec|
   spec.add_dependency "activesupport", ">= 7.1"
   spec.add_dependency "zeitwerk", ">= 2"
 
-  spec.add_development_dependency "bundler", "~> 2.2"
+  spec.add_development_dependency "bundler", ">= 2.2"
   spec.add_development_dependency "rake", ">= 12.3.3"
   spec.add_development_dependency "rspec", "~> 3.7"
   spec.add_development_dependency "pry"
-  spec.add_development_dependency "sqlite3", "< 2"
+  spec.add_development_dependency "sqlite3", ">= 2"
   spec.add_development_dependency "activerecord"
   spec.add_development_dependency "activejob"
   spec.add_development_dependency "actionpack"
