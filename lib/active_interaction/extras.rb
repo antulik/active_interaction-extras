@@ -2,8 +2,6 @@ require "active_interaction/extras/version"
 
 require 'active_support'
 require 'active_support/core_ext/class/attribute'
-require 'active_support/core_ext/module/concerning'
-
 require 'active_interaction'
 
 require 'zeitwerk'

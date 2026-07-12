@@ -9,9 +9,11 @@ This gem contains the collection of useful extensions to [active_interaction](ht
 - [Filters](#filters)
     - [Anything](#anything)
     - [UUID](#uuid)
+    - [ActiveRecord Relation](#activerecord-relation)
 - [Filter Extensions](#filter-extensions)
     - [Hash: auto strip](#hash-auto-strip)
     - [Object: multiple classes](#object-multiple-classes)
+    - [Timezone support](#timezone-support)
 - [Extensions](#extensions)
   - [Filter alias](#filter-alias)
   - [Halt](#halt)
@@ -19,9 +21,22 @@ This gem contains the collection of useful extensions to [active_interaction](ht
   - [RunCallback](#runcallback)
   - [StrongParams](#strongparams)
   - [Transaction](#transaction)
+  - [NamedCallbacks](#namedcallbacks)
+  - [ModelNames](#modelnames)
+  - [FormFor](#formfor)
+  - [NestedAttributes](#nestedattributes)
+  - [InitializeWith](#initializewith)
+  - [AppendInputs](#appendinputs)
+  - [IncludeErrors](#includeerrors)
+  - [InstanceRunnable](#instancerunnable)
+  - [Current](#current)
+  - [AddToBatch](#addtobatch)
+  - [AllRunner](#allrunner)
+  - [FileBlobs](#fileblobs)
 - [Jobs](#jobs)
   - [ActiveJob](#activejob)
   - [Sidekiq](#sidekiq)
+  - [GoodJob](#goodjob)
 - [RSpec](#rspec)
 
 ## Installation
@@ -61,6 +76,20 @@ class Service < ActiveInteraction::Base
 end
 ```
 
+### ActiveRecord Relation
+
+```ruby
+class Service < ActiveInteraction::Base
+  ar_relation :users
+
+  def execute
+    users.where(active: true)
+  end
+end
+
+Service.run!(users: User.all) # accepts any ActiveRecord::Relation
+```
+
 ## Filter Extensions
 
 You can load all filter extensions with:
@@ -93,6 +122,27 @@ This extension allows using `object` filter with multiple classes.
 ```ruby
 class Service < ActiveInteraction::Base
   object :user, class: [User, AdminUser]
+end
+```
+
+### Timezone support
+
+Parses time strings in the configured timezone. Requires a separate require:
+
+```ruby
+require 'active_interaction/extras/filter_extensions/timezone_support'
+
+class Service < ActiveInteraction::Base
+  time :epoch
+
+  def execute
+    epoch.iso8601
+  end
+end
+
+Time.use_zone('Bangkok') do
+  Service.run!(epoch: '2000-12-11 10:30')
+  # => '2000-12-11T10:30:00+07:00'
 end
 ```
 
@@ -237,6 +287,241 @@ UpdateUserForm.run
 Comment.count # => 0
 ```
 
+### NamedCallbacks
+
+Provides friendly method names for ActiveInteraction's internal callbacks.
+
+```ruby
+class Service < ActiveInteraction::Base
+  include ActiveInteraction::Extras::NamedCallbacks
+
+  before_filter :normalize_inputs
+  after_validate :log_validation
+  before_execute :setup_context
+  after_execute :send_notification
+
+  def execute
+  end
+end
+```
+
+### ModelNames
+
+Note: This module is currently NOT included in `ActiveInteraction::Extras::All`.
+Sets up automatic ActiveModel naming for forms based on their class name for URL helpers.
+
+```ruby
+class ApplicationForm < ActiveInteraction::Base
+  include ActiveInteraction::Extras::ModelNames
+end
+
+class User::SignUpForm < ApplicationForm
+  # route_key is auto-set to :user_sign_up_forms
+end
+
+class User::UpdateForm < ApplicationForm
+  singular_resource_route_key! # route_key becomes :user_update_form
+end
+```
+
+### FormFor
+
+Makes form objects work with Rails URL helpers by delegating routing to a model field.
+
+```ruby
+class User::Form < ActiveInteraction::Base
+  include ActiveInteraction::Extras::FormFor
+
+  object :user
+  form_for :user # delegates routing to user
+
+  # url_for(form) => "/users/1"
+end
+```
+
+### NestedAttributes
+
+Rails-style `accepts_nested_attributes_for` for interactions.
+
+```ruby
+class Form < ActiveInteraction::Base
+  include ActiveInteraction::Extras::NestedAttributes
+
+  array :items
+
+  accepts_nested_attributes_for :items,
+    permit: [:name, :quantity]
+
+  def execute
+    # items_attributes automatically mapped to items
+  end
+end
+```
+
+### InitializeWith
+
+Lazily sets input values after initialization, only for inputs not explicitly given.
+
+```ruby
+class Service < ActiveInteraction::Base
+  include ActiveInteraction::Extras::InitializeWith
+
+  anything :current_user
+
+  initialize_with do
+    { current_user: User.current }
+  end
+
+  def execute
+  end
+end
+
+Service.run! # current_user => User.current
+Service.run!(current_user: other_user) # current_user => other_user
+```
+
+### AppendInputs
+
+Set input defaults after initialization without overwriting explicitly given inputs.
+
+```ruby
+class Service < ActiveInteraction::Base
+  include ActiveInteraction::Extras::AppendInputs
+
+  string :tenant_name
+
+  default_inputs do
+    { tenant_name: Current.tenant.name }
+  end
+
+  # Or single default:
+  default_input :tenant_name do
+    Current.tenant.name
+  end
+end
+```
+
+### IncludeErrors
+
+Merges a model's errors into the interaction's errors and halts if invalid.
+
+```ruby
+class Service < ActiveInteraction::Base
+  include ActiveInteraction::Extras::IncludeErrors
+
+  def execute
+    model = User.new(params)
+    model.save
+    include_errors!(model) # merges model errors and halts if invalid
+  end
+end
+```
+
+### InstanceRunnable
+
+Allows running interactions from an already-instantiated object. Useful for controller-style usage with `save`/`save!` aliases.
+
+```ruby
+class Form < ActiveInteraction::Base
+  include ActiveInteraction::Extras::InstanceRunnable
+
+  string :name
+
+  def execute
+  end
+end
+
+# Controller-style:
+def create
+  if form.save
+    redirect_to record_path
+  else
+    render :new
+  end
+end
+
+def form
+  @form ||= Form.new(params:)
+end
+```
+
+### Current
+
+Provides `ActiveSupport::CurrentAttributes` context accessible via `current`.
+
+```ruby
+class Service < ActiveInteraction::Base
+  include ActiveInteraction::Extras::Current
+
+  def execute
+    current.job   # the current job (if running in background)
+    current.batch # the current GoodJob batch (if applicable)
+  end
+end
+```
+
+### AddToBatch
+
+Conditionally runs a block within a GoodJob batch if currently in a batch context.
+
+```ruby
+class Service < ActiveInteraction::Base
+  include ActiveInteraction::Extras::AddToBatch
+
+  def execute
+    add_to_batch do
+      SomeOtherService.delay.run(some_param: value)
+    end
+  end
+end
+```
+
+### AllRunner
+
+Runs the service for every record in the default scope of the object filter.
+
+```ruby
+class NotifyUsers < ActiveInteraction::Base
+  include ActiveInteraction::Extras::AllRunner
+
+  object :user
+
+  def execute
+    # process each user
+  end
+end
+
+# Run synchronously for all users:
+NotifyUsers.all.run!
+
+# Run async via GoodJob batches:
+NotifyUsers.all.delay.run!
+
+# With custom scope:
+NotifyUsers.all(user: User.active).delay(wait: 5.minutes).run!
+```
+
+### FileBlobs
+
+Helper for working with ActiveStorage attachments in form objects.
+
+```ruby
+class Doc::Form < ActiveInteraction::Base
+  include ActiveInteraction::Extras::FileBlobs
+
+  object :doc
+
+  model_fields(:doc) do
+    array :files
+  end
+
+  # In view:
+  # form.blobs_for(:files).each do |blob|
+  #   = f.hidden_field :files, value: blob.signed_id
+  # end
+end
+```
+
 ## Jobs
 
 You no longer need to create a separate Job class for the each interaction. This Job extension automatically converts interactions to background jobs. By convention each interaction will have a nested `Job` class which will be inherited from the parent interaction `Job` class (e.g. `ApplicationInteraction::Job`). 
@@ -337,6 +622,39 @@ end
 
 DoubleService.run # => RuntimeError
 DoubleService.delay.perform_now(x: 2) # => returns 2
+```
+
+### GoodJob
+
+Extends the ActiveJob integration with GoodJob batch support and concurrency keys.
+
+```ruby
+class ApplicationInteraction < ActiveInteraction::Base
+  include ActiveInteraction::Extras::GoodJob
+
+  class Job < ActiveJob::Base
+    include GoodJob::ActiveJobExtensions::Concurrency
+    include ActiveInteraction::Extras::GoodJob::Perform
+  end
+end
+
+class ProcessUser < ApplicationInteraction
+  object :user
+  def execute
+  end
+end
+
+class ProcessUserFinished < ApplicationInteraction
+  def execute
+  end
+end
+
+# Create and enqueue a GoodJob batch:
+batch = ProcessUserFinished.batch_job
+batch.add do
+  ProcessUser.delay.run!(user: User.last)
+end
+batch.enqueue
 ```
 
 ## Rspec

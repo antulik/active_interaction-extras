@@ -2,7 +2,9 @@
 module ActiveInteraction::Extras::NestedAttributes
   extend ActiveSupport::Concern
 
-  concern :InputsExtension do
+  module InputsExtension
+    extend ActiveSupport::Concern
+
     def normalize(inputs)
       if @base.class.respond_to? :nested_attribute_options
         @base.class.nested_attribute_options.each do |attribute, options|
