@@ -514,12 +514,19 @@ class Doc::Form < ActiveInteraction::Base
   model_fields(:doc) do
     array :files
   end
-
-  # In view:
-  # form.blobs_for(:files).each do |blob|
-  #   = f.hidden_field :files, value: blob.signed_id
-  # end
+  
+  def execute
+    save_model!(:doc)
+  end
 end
+```
+
+```slim
+/ _form.html.slim 
+= form.blobs_for(:files).each do |blob|
+  = f.hidden_field :files, value: blob.signed_id
+
+= f.file_field :files, multiple: true, direct_upload: true
 ```
 
 ## Jobs

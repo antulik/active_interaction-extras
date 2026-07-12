@@ -9,12 +9,12 @@ module ActiveInteraction::Extras::FileBlobs
   #   = f.hidden_field :file, value: nil
   #
   #   - form.blobs_for(:file).each do |blob|
-  #     .offset-3 data-controller="remove"
+  #     div data-controller="remove"
   #       = f.hidden_field :file, value: blob.signed_id
   #       - if blob.representable?
   #         = image_tag url_for(blob.representation(resize_to_fit: [300, 80])), height: 80
-  #       button type="button" data-action="click->remove#remove" class="btn btn-link btn-link-text"
-  #         'Archive
+  #       button type="button" data-action="click->remove#remove"
+  #         'Remove
   #
   #   = f.input :new_file, as: :file
   #
@@ -38,12 +38,10 @@ module ActiveInteraction::Extras::FileBlobs
   #     end
   #   end
   #
-  # @example has_one_attached :file
+  # @example has_many_attached :files
   #
   #   # doc/_form.html.slim
-  #   = f.input :files, as: :file,
-  #     label: "Files",
-  #     input_html: { multiple: true, direct_upload: true }
+  #   = f.file_field :files, multiple: true, direct_upload: true
   #
   #   # doc/form.rb
   #   class Doc::Form < ActiveInteraction::Base
@@ -54,7 +52,7 @@ module ActiveInteraction::Extras::FileBlobs
   #     end
   #
   #     def execute
-  #       save_model!(:person_licence)
+  #       save_model!(:files)
   #     end
   #   end
   #
