@@ -67,7 +67,11 @@ module ActiveInteraction::Extras::StrongParams
 
         { name => value }
       when ActiveInteraction::HashFilter, ActiveInteraction::ObjectFilter
-        { name => {} }
+        if permit == true
+          { name => {} }
+        else
+          { name => permit }
+        end
       else
         if permit == true
           name
