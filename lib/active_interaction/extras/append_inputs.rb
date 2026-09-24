@@ -41,14 +41,18 @@ module ActiveInteraction::Extras::AppendInputs
 
   class_methods do
     def default_inputs(&block)
-      after_initialize do
+      # prepend: true - so it runs after ActiveInteraction::Extras::ModelFields.assign_model_values_to_filters
+      # callback order is inverse, so that's why it's confusing
+      after_initialize prepend: true do
         hash = block.call
         default_inputs(hash)
       end
     end
 
     def default_input(name, &block)
-      after_initialize do
+      # prepend: true - so it runs after ActiveInteraction::Extras::ModelFields.assign_model_values_to_filters
+      # callback order is inverse, so that's why it's confusing
+      after_initialize prepend: true do
         default_inputs(name => instance_exec(&block))
       end
     end
