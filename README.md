@@ -20,6 +20,7 @@ This gem contains the collection of useful extensions to [active_interaction](ht
   - [ModelFields](#modelfields)
   - [RunCallback](#runcallback)
   - [StrongParams](#strongparams)
+  - [FormParams](#formparams)
   - [Transaction](#transaction)
   - [NamedCallbacks](#namedcallbacks)
   - [ModelNames](#modelnames)
@@ -266,6 +267,27 @@ form_params = ActionController::Parameters.new(
 )
 
 Service.run(form_params: form_params)
+```
+
+### FormParams
+
+Builds permitted form attributes and wraps them in the interaction's model parameter key.
+
+```ruby
+class User::Form < ActiveInteraction::Base
+  include ActiveInteraction::Extras::FormParams
+
+  string :name, permit: true, default: nil
+  string :role, default: nil
+
+  def execute
+  end
+end
+
+form = User::Form.new(name: 'Ada', role: 'admin')
+form.form_attributes # => permitted parameters containing only `name`
+form.to_params       # => { user_form: #<ActionController::Parameters ...> }
+User::Form.to_params(name: 'Ada') # => { user_form: { name: 'Ada' } }
 ```
 
 ### Transaction

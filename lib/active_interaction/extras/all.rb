@@ -12,6 +12,7 @@ module ActiveInteraction::Extras::All
   include ActiveInteraction::Extras::NestedAttributes
 
   include ActiveInteraction::Extras::StrongParams
+  include ActiveInteraction::Extras::FormParams
   include ActiveInteraction::Extras::Current
 
   include ActiveInteraction::Extras::AddToBatch
