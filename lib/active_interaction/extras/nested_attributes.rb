@@ -12,7 +12,7 @@ module ActiveInteraction::Extras::NestedAttributes
           next if !inputs.key?(alias_name) && !inputs.key?(alias_name.to_sym)
 
           value = inputs[alias_name] || inputs[alias_name.to_sym]
-          value = @base.class.process_nested_collection(value, options)
+          value = @base.class.process_nested_collection(attribute, value, options)
 
           inputs[attribute.to_s] = value
         end
@@ -28,10 +28,67 @@ module ActiveInteraction::Extras::NestedAttributes
     class_attribute :nested_attribute_options, default: {}
   end
 
+  def save_collection(list, new_list,
+    updated: -> { _2.save },
+    removed: -> { it.destroy },
+    added: -> { it.save }
+  )
+    old_list = list.to_a.dup
+
+    new_list.each do |new_record|
+      index = old_list.index { it.id == new_record.id }
+      if index
+        existing_record = old_list.delete_at(index)
+        if updated
+          updated.call(existing_record, new_record)
+        else
+          yield(existing_record, new_record, :updated)
+        end
+      else
+        if added
+          added.call(new_record)
+        else
+          yield(nil, new_record, :added)
+        end
+      end
+    end
+
+    old_list.each do |record|
+      if removed
+        removed.call(record)
+      else
+        yield(record, nil, :removed)
+      end
+    end
+  end
+
   class_methods do
+    # @example
+    #   class User::Form < BaseService
+    #     object :user
+    #
+    #     model_fields(:user) do
+    #       array :user_times, default: [] do
+    #         object class: UserTime
+    #       end
+    #     end
+    #
+    #     accepts_nested_attributes_for :user_times,
+    #       permit: %i[day start_seconds end_seconds],
+    #       allow_destroy: true
+    #
+    #     def execute
+    #       user_times.each { it.user = user }
+    #       save_collection(user.user_times, user_times)
+    #       include_collection_errors! :user_times
+    #
+    #       save_model! :user
+    #     end
+    #   end
     def accepts_nested_attributes_for(*attributes)
       options = attributes.extract_options!
-      options.reverse_merge!(allow_destroy: false, update_only: false)
+      options.assert_valid_keys(:allow_destroy, :reject_if, :permit)
+      options.reverse_merge!(allow_destroy: false)
 
       if options.key?(:permit)
         if options[:permit].is_a?(Array)
@@ -42,6 +99,9 @@ module ActiveInteraction::Extras::NestedAttributes
       end
 
       attributes.each do |attribute|
+        # disable permit for original attribute
+        filters[attribute].options[:permit] = false
+
         nested_attribute_options[attribute] = options
 
         case filters[attribute]
@@ -58,7 +118,7 @@ module ActiveInteraction::Extras::NestedAttributes
 
     def define_association_setter_for_many(association, options)
       define_method "#{association}_attributes=" do |attributes|
-        attributes = self.class.process_nested_collection(attributes, options)
+        attributes = self.class.process_nested_collection(association, attributes, options)
         send("#{association}=", attributes)
       end
     end
@@ -75,7 +135,7 @@ module ActiveInteraction::Extras::NestedAttributes
       end
     end
 
-    def process_nested_collection(attributes, options = nil)
+    def process_nested_collection(association, attributes, options = nil)
       attributes = attributes.values if attributes.is_a?(Hash)
       if options&.dig(:allow_destroy)
         attributes.reject! do |attribute|
@@ -84,6 +144,33 @@ module ActiveInteraction::Extras::NestedAttributes
       end
 
       attributes.reject! { |attribute| call_reject_if(attribute, options[:reject_if]) } if options&.dig(:reject_if)
+
+      sub_filter = filters[association].filters[:"0"]
+      if sub_filter
+        if sub_filter.options[:converter]
+          attributes = attributes.map do |attrs|
+            sub_filter.send(:converter, attrs)
+          end
+
+        elsif sub_filter.is_a?(ActiveInteraction::ObjectFilter)
+          cast_class = sub_filter.send(:klass)
+
+          ids = attributes.map { it["id"] }.compact_blank
+          by_ids = ids.present? ? Array.wrap(cast_class.find(*ids)).index_by { it.id } : {}
+
+          attributes = attributes.map do |attrs|
+            attrs = attrs.except("_destroy")
+
+            if attrs["id"].present?
+              record = by_ids.fetch attrs["id"]
+              record.assign_attributes(attrs)
+              record
+            else
+              cast_class.new(attrs)
+            end
+          end
+        end
+      end
 
       attributes
     end
@@ -96,30 +183,6 @@ module ActiveInteraction::Extras::NestedAttributes
         method(callback).arity.zero? ? send(callback) : send(callback, attributes)
       when Proc
         callback.call(attributes)
-      end
-    end
-  end
-
-  def assign_collection_association(model, association_name, attributes_collection, destroy_missing: false, **options)
-
-    if attributes_collection.is_a?(ActiveRecord::Associations::CollectionProxy)
-      return attributes_collection
-    end
-
-    model.instance_exec do
-      begin
-        old_options = nested_attributes_options[association_name]
-        nested_attributes_options[association_name] = options
-
-        list = assign_nested_attributes_for_collection_association(association_name, attributes_collection)
-
-        if destroy_missing
-          association(association_name).scope.excluding(list).each(&:destroy!)
-        end
-
-        list
-      ensure
-        nested_attributes_options[association_name] = old_options
       end
     end
   end
